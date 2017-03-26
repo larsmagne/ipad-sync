@@ -1,8 +1,6 @@
 #!/bin/bash
 
 command="$1"
-vendor="05ac"
-product="12ab"
 
 if [ "$command" = "remove" ]; then
     umount /media/ipad
