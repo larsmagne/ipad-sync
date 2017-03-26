@@ -1,7 +1,6 @@
 #!/bin/bash
 
 command="$1"
-device="$2"
 vendor="05ac"
 product="12ab"
 
@@ -10,32 +9,24 @@ if [ "$command" = "remove" ]; then
     exit
 fi
 
-for X in /sys/bus/usb/devices/*; do
-    if [ "$vendor" == "$(cat "$X/idVendor" 2>/dev/null)" -a "$product" == "$(cat "$X/idProduct" 2>/dev/null)" ]
-    then
-	path="$X"
-    fi
-done
-
-echo "Command $command $device $path" >> /tmp/usb-automount
-
-# Allow automounting it.
-#if [ -f "$path/authorized" ]; then
-#    echo 1 > "$path/authorized"
-#fi
-
 ifuse /media/ipad
 
 pics=0
 
 if [ -d "/media/ipad/DCIM/100APPLE" ]; then
     cd /media/ipad/DCIM/100APPLE
+    # You'd normally just use rsync or something here, but we do
+    # it manually here because we post-process the file names for
+    # this particular application.
     for pic in IMG*; do
 	to="/home/larsi/pics/ipad"
 	if [ ! -f "$to/$pic" ]; then
 	    cp -av "$pic" "$to/$pic"
 	    chown larsi.users "$to/$pic"
 	    pics=$(($pics + 1))
+	    # In addition to syncing to the main directory, also rename
+	    # and put these files into the current directory for the
+	    # film I'm watching.
 	    if echo "$pic" | grep PNG > /dev/null; then
 		shot=`echo "$pic" | sed 's/IMG_/shot/' | sed 's/PNG/png/'`
 		if [ ! -f "/home/larsi/.movie-current/$shot" ]; then
@@ -55,9 +46,5 @@ else
     message="pictures"
 fi
 
+# Tell the user what happened.
 DISPLAY=:0.0 XAUTHORITY=/home/larsi/.Xauthority notify-send "Ipad Picture Copier" "Copied $pics $message"
-
-# Deny automounting it.
-#if [ -f "$path/authorized" ]; then
-#    echo 0 > "$path/authorized"
-#fi
