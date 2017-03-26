@@ -1,3 +1,14 @@
+This is a simple setup to automatically copy stuff from IOS devices
+(like an Ipad) to a Linux system when plugged in via USB.
+
+Copy the files over like this:
+
 cp ipad-sync /usr/local/sbin/ipad-sync
 cp ipad-sync@.service /etc/systemd/system/ipad-sync@.service
 cp 90-ipad-sync.rules /etc/udev/rules.d/90-ipad-sync.rules
+
+And then adjust everything so that it works for you.  The ipad-sync
+script is basically a template to be altered to your needs.
+
+For more about requirements and stuff, see
+https://lars.ingebrigtsen.no/2017/03/25/ipad-screenshots-and-linux/
