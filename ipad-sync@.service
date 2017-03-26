@@ -1,0 +1,11 @@
+[Unit]
+Description=Automatically copy images from plugged-in IOS devices
+BindTo=%i.device
+After=%i.device
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/ipad-sync add /%I
+ExecStop=/usr/local/sbin/ipad-sync remove /%I
+RemainAfterExit=yes
+KillMode=none

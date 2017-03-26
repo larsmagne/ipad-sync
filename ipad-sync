@@ -1,0 +1,63 @@
+#!/bin/bash
+
+command="$1"
+device="$2"
+vendor="05ac"
+product="12ab"
+
+if [ "$command" = "remove" ]; then
+    umount /media/ipad
+    exit
+fi
+
+for X in /sys/bus/usb/devices/*; do
+    if [ "$vendor" == "$(cat "$X/idVendor" 2>/dev/null)" -a "$product" == "$(cat "$X/idProduct" 2>/dev/null)" ]
+    then
+	path="$X"
+    fi
+done
+
+echo "Command $command $device $path" >> /tmp/usb-automount
+
+# Allow automounting it.
+#if [ -f "$path/authorized" ]; then
+#    echo 1 > "$path/authorized"
+#fi
+
+ifuse /media/ipad
+
+pics=0
+
+if [ -d "/media/ipad/DCIM/100APPLE" ]; then
+    cd /media/ipad/DCIM/100APPLE
+    for pic in IMG*; do
+	to="/home/larsi/pics/ipad"
+	if [ ! -f "$to/$pic" ]; then
+	    cp -av "$pic" "$to/$pic"
+	    chown larsi.users "$to/$pic"
+	    pics=$(($pics + 1))
+	    if echo "$pic" | grep PNG > /dev/null; then
+		shot=`echo "$pic" | sed 's/IMG_/shot/' | sed 's/PNG/png/'`
+		if [ ! -f "/home/larsi/.movie-current/$shot" ]; then
+		    ln "$to/$pic" "/home/larsi/.movie-current/$shot"
+		fi
+	    fi
+	fi
+    done
+fi
+
+cd /
+umount /media/ipad
+
+if [ "$pics" = "1" ]; then
+    message="picture"
+else
+    message="pictures"
+fi
+
+DISPLAY=:0.0 XAUTHORITY=/home/larsi/.Xauthority notify-send "Ipad Picture Copier" "Copied $pics $message"
+
+# Deny automounting it.
+#if [ -f "$path/authorized" ]; then
+#    echo 0 > "$path/authorized"
+#fi

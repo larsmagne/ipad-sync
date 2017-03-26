@@ -1,0 +1,1 @@
+ATTR{idVendor}="05ac", ATTR{idProduct}="12ab", PROGRAM="/bin/systemd-escape -p --template=ipad-sync@.service $env{DEVNAME}", ENV{SYSTEMD_WANTS}+="%c"

@@ -1,0 +1,3 @@
+cp ipad-sync /usr/local/sbin/ipad-sync
+cp ipad-sync@.service /etc/systemd/system/ipad-sync@.service
+cp 90-ipad-sync.rules /etc/udev/rules.d/90-ipad-sync.rules
